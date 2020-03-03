@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+
+<style>
+body{
+margin:20px;
+background-color:#666;
+}
+
+
+#canv{
+background-color:#FFF;
+border:#000 1px solid;
+}
+</style>
+
+
+
+
+<script>
+function initCanvas(){
+    var ctx = document.getElementById('canv').getContext('2d');
+    var cW = ctx.canvas.width, cH = ctx.canvas.height;
+    var r;
+    var trayyy=[];
+
+   var x  ;
+    var y ;
+    var u =0 ;
+    
+    var t = 0.9;
+    var b = 247;
+    var mouseY;
+    var mousex;
+      
+
+var tray=[];
+
+var trayy=[];
+      
+   ctx.canvas.addEventListener('mousemove', function(event){
+   mouseX = event.clientX - ctx.canvas.offsetLeft;
+   mouseY = event.clientY - ctx.canvas.offsetTop;
+
+  
+});
+
+function anim(){
+  
+ctx.fillStyle = "magenta";
+
+           ctx.fillRect(x, y, 50, 50);
+            
+if(mouseX<100){
+              t = 0.7;
+               b = 250;
+            }
+
+            if(mouseX>100 & mouseX<300){
+              t = 0.3;
+               b = 280;
+            }
+
+            if(mouseX>300 & mouseX<400){
+              t=-0.2;
+              b= 420;
+
+            }
+            if(mouseX>400 & mouseX<600){
+              t=-0.65;
+              b= 568;
+
+            }
+            
+y=x*Math.sin(t)+b;
+         
+         x=mouseX-25;
+
+       ctx.arc(290, -20, 400, 0, Math.PI * 2);
+         ctx.stroke();
+         
+   
+}
+
+
+    function addtrayyy(){
+
+        var x = cW;
+        var y =Math.floor(Math.random() * 200) +200;
+        var s= Math.floor(Math.random()*1  ) +1;
+        trayyy.push({"x":x,"y":y,"s":s});
+    } 
+
+    function boxs(){
+
+
+addtrayyy();
+
+       for (var i=0;i<3;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "magenta";
+
+            ctx.fillRect(trayyy[i].x-=trayyy[i].s*5, trayyy[i].y, 5, 5);
+
+            ctx.fill();
+            
+ctx.restore();
+r=mouseX-25;
+  
+if (r+50>trayyy[i].x && r<=trayyy[i].x+5 && y+50>=trayyy[i].y && y<=trayyy[i].y+15  ){
+
+  alert();
+ 
+}
+
+            if(trayyy[i].x<0){
+                trayyy.splice(i,100);
+            }
+
+ 
+        }
+        
+    }
+
+
+
+     function addtray(){
+
+      var x = mouseX;
+        var y =0;
+        var s= Math.floor(Math.random()*1  ) +1;
+    
+        tray.push({"x":x,"y":y,"s":s});
+    } 
+
+    function box(){
+
+
+addtray();
+
+       for (var i=0;i<1;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "magenta";
+
+            ctx.fillRect(tray[i].x, tray[i].y+=tray[i].s*5, 5, 15);
+
+            ctx.fill();
+            
+ctx.restore();
+
+r=mouseX-25;
+  
+if (r+50>tray[i].x && r<=tray[i].x+5 && y+50>=tray[i].y && y<=tray[i].y+15  ){
+
+  alert();
+ 
+}
+
+
+            if(tray[i].y>cH){
+                tray.splice(i,100);
+            }
+
+        }
+
+
+
+        
+    }
+
+
+     function addtrayy(){
+
+      var x = mouseX;
+        var y =0;
+        var s= Math.floor(Math.random()*1  ) +1;
+      
+        trayy.push({"x":x,"y":y,"s":s});
+    } 
+
+      
+
+          function boxx(){
+
+
+setTimeout(addtrayy,1000);
+
+       for (var i=0;i<1;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "magenta";
+
+            ctx.fillRect(trayy[i].x, trayy[i].y+=trayy[i].s*5, 5, 15);
+
+            ctx.fill();
+            
+ctx.restore();
+
+
+r=mouseX-25;
+  
+if (r+50>trayy[i].x && r<=trayy[i].x+5 && y+50>=trayy[i].y && y<=trayy[i].y+15  ){
+
+  alert();
+ 
+}
+
+            if(trayy[i].y>cH){
+                trayy.splice(i,100);
+            }
+
+          
+        }
+
+
+    }
+      
+
+
+   function animate(){
+    
+     
+        ctx.clearRect(0, 0, cW, cH);
+
+ 
+    anim();
+    boxs();
+
+
+    box();
+    
+
+    boxx();
+    
+      //setTimeout(boxx,1000); 
+
+ 
+
+    }
+
+    var animateInterval = setInterval(animate, 30);
+
+    ctx.canvas.addEventListener('click', function(event) {
+        clearInterval(animateInterval);
+    
+    });
+  
+}
+window.addEventListener('load', function(event) {
+    initCanvas();
+});
+</script>
+
+</head>
+<body>
+<canvas id="canv" width="600" height="500"></canvas>
+
+</body>
+
+</html>

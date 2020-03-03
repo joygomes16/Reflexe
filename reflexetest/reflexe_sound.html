@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <script src="player.js"></script>
+<style>
+body{ margin:8px; background:#CCC; }
+#canv{ background:#FFF; border:#000 1px solid; }
+
+#popup
+        {  
+
+            width:500px;
+            height:250px;;
+            border:2px solid #30c38c;
+      
+            top:30%;
+            position:relative;
+            margin: 0 auto;
+            background-color: #141213;
+            -moz-border-radius: 10px;
+                 border-radius: 10px;
+                 opacity:1;
+        }
+
+#overlay
+        {
+            position:absolute;
+            top:0px;
+            visibility:hidden;
+            
+            background:rgba(0,0,0,0.6);
+      z-index:5;
+            left:0px;
+            height:100%;
+            width:100%;
+            text-align:center;
+    }
+
+#overlay:target
+        {
+            visibility:visible;
+            -webkit-animation: fade 400ms ease;
+    }
+#overlay:target > #popup
+        {
+            
+             -webkit-animation: moveFromBottom 400ms ease;
+        }
+ @-webkit-keyframes fade
+        {
+            from 
+      {
+                opacity: 0;
+            }
+            to 
+      {
+        opacity: 1;        
+            }
+        }
+        
+ @-webkit-keyframes moveFromBottom
+        {
+            from {
+               
+               
+                -webkit-transform: scale(.5);
+                opacity: 0;
+            }
+            to {
+                
+                -webkit-transform: scale(1);
+                opacity: 1;        
+            }
+        }
+
+
+.close_button_1
+            {
+                position:absolute;
+                cursor:pointer;
+                border:none;
+                margin-top:-5px;
+                width:80px;
+                height:80px;
+        
+      }
+
+.close_button_2
+            {
+                position:absolute;
+                cursor:pointer;
+                border:none;
+                margin-top:0px;
+                width:70px;
+                height:70px;
+        
+            }
+
+</style>
+<script>
+var player =new Sprite("player.png");
+var playerimage = new Image();
+playerimage.src = "player.png"; 
+var back = new Image();
+back.src="back.png";
+var back2 = new Image();
+back2.src="back2.png";
+var back1 = new Image();
+back1.src="backdown.png";
+var path = new Image();
+path.src="path3.png";
+var ship = new Image();
+ship.src="shipsss1.png";
+var ships = new Image();
+ships.src="alien.png";
+var bullet = new Image();
+bullet.src="bullet1.png";
+var bullets = new Image();
+bullets.src="bullet2.png";
+var saber = new Image();
+saber.src="saber1.png";
+var sabers = new Image();
+sabers.src="saber11.png";
+var flame = new Image();
+flame.src="bullet.png";
+
+var rotfx=0;
+ var rotfy=0;
+ var rotfx1=0;
+ var rotfy1=0;
+ var x=0;
+ var y=0;
+ var p;
+ var q;
+ var rop;
+ var ropp;
+ var sound_muted = false;
+var sound;
+var music;
+var foot;
+music = document.createElement("audio");
+  music.src = "interstellar.mp3";
+  
+  music.loop = true;
+  music.play();
+
+//rotation
+ var RotatingRectangle = function(x, y, width, height, rot, rgb){
+        
+        var rotation = rot;
+        var rotationState = 0;
+ 
+        this.draw = function(ctx){
+rotationState += rotation;
+ p=rop-25;
+ q=ropp-25;
+ //alert(rop+"");
+ 
+ //alert(RotatingRectangle.x+" "); 
+if (p+50>x+50*Math.cos(rotationState+1.5) && p<=(x+50*Math.cos(rotationState+1.5))+5 && q+50>=y+45*Math.sin(rotationState+1.5) && q<=(y+45*Math.sin(rotationState+1.5))+52.5  ){
+
+  //alert();
+  music.pause();
+  if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+if (p+50>x+50*Math.cos(rotationState-1.5) && p<=(x+50*Math.cos(rotationState-1.5))+5 && q+50>=y+45*Math.sin(rotationState-1.5) && q<=(y+45*Math.sin(rotationState-1.5))+52.5  ){
+
+  //alert();
+  music.pause();
+  if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+
+            if(x>1330){
+  x=0;
+
+            }
+x=x+2;
+//y=0.001899*x*x-0.75*x+400;
+y=0.000520*x*x-0.65400*x+440;
+//y=0.000516*x*x-0.65400*x+440;
+//y=0.000520*x*x-0.65400*x+515;
+rotfx=x;
+rotfy=y;
+          ctx.save();
+          ctx.translate(x+(width/2), y+(height/2));
+          ctx.rotate(rotationState);
+          ctx.fillStyle = rgb;
+          //ctx.fillRect(0-(width/2), 0-(height/2), width, height);
+          ctx.drawImage(saber,0-(width/2),0-(height/2));
+          ctx.restore();
+          
+        }
+      }
+
+      function generateShapes(){
+        var count = 1;
+
+        var allShapes = [];
+        for (i=0; i < count; ++i) {
+          //var rotation = (Math.random()*.08)+0.05;
+          var rotation = (Math.random()*.09)+0.07;
+          var x = 0;
+         // var y =0.001899*x*x-0.75*x+400;
+         //y=0.000520*x*x-0.65400*x+440;
+         y=0.000516*x*x-0.65400*x+440;
+          //y=0.000520*x*x-0.65400*x+515;
+          //var col=ctx.fillStyle = "magenta";
+         // var red = Math.floor(Math.random() * 256);
+          //var green = Math.floor(Math.random() * 256);
+          //var blue = Math.floor(Math.random() * 256);
+           var red = 46;
+          var green = 123;
+          var blue = 10;
+          //var opacity = Math.random();
+          var opacity = 1;
+          //var direction = Math.round(Math.random()) == 0 ? false : true
+          //var rect = new RotatingRectangle(x, y, 10, 100, rotation, "rgba("+red+", "+green+", "+blue+", "+opacity+")", direction);
+          var rect = new RotatingRectangle(x, y, 10, 105, rotation,"rgba("+red+", "+green+", "+blue+", "+opacity+")");
+          allShapes.push(rect); 
+        }
+        return allShapes;
+      }
+      function draw() {
+        generateShapes();
+        var canvas = document.getElementById('canv');
+
+        if (canvas.getContext) {
+          var ctx = canvas.getContext('2d');
+          //ctx.clearRect(0, 0, 640, 680);
+          for (i=0; i < allShapes.length; ++i) {
+            allShapes[i].draw(ctx);
+
+ 
+
+
+document.getElementById('status').innerHTML = "rotation="+allShapes.length;
+          } 
+        }
+      }
+
+      var allShapes = generateShapes();
+
+//rotation
+//rotationf
+ var RotatingRectanglef = function(x, y, width, height, rot, rgb){
+        //var RotatingRectangle = function(x, y, width, height, rot,col, direction){
+        var rotation = rot;
+        var rotationState = 0;
+ 
+        this.drawf = function(ctx){
+            //direction ? rotationState += rotation : rotationState -= rotation;
+rotationState += rotation;
+            //if(x>1330){
+  //x=0;
+               // allShapes.splice(i,100);
+            //}
+            x=rotfx;
+y=rotfy;
+//x=x+2;
+//y=0.001899*x*x-0.75*x+400;
+//y=0.000520*x*x-0.65400*x+440;
+//y=0.000516*x*x-0.65400*x+440;
+//y=0.000520*x*x-0.65400*x+515;
+          ctx.save();
+          ctx.translate(x+(width/2), y+(height/2));
+          ctx.rotate(rotationState);
+          ctx.fillStyle = rgb;
+          //ctx.fillRect(0-(width/2), 0-(height/2), width, height);
+          ctx.drawImage(saber,0-(width/2),0-(height/2));
+          ctx.restore();
+          
+        }
+      }
+
+      function generateShapesf(){
+        var count = 1;
+
+        var allShapesf = [];
+        for (i=0; i < count; ++i) {
+          var rotation = (Math.random()*.08)+0.05;
+          var x = 0;
+         // var y =0.001899*x*x-0.75*x+400;
+         //y=0.000520*x*x-0.65400*x+440;
+         y=0.000516*x*x-0.65400*x+440;
+          //y=0.000520*x*x-0.65400*x+515;
+          //var col=ctx.fillStyle = "magenta";
+         // var red = Math.floor(Math.random() * 256);
+          //var green = Math.floor(Math.random() * 256);
+          //var blue = Math.floor(Math.random() * 256);
+           var red = 46;
+          var green = 123;
+          var blue = 10;
+          //var opacity = Math.random();
+          var opacity = 1;
+          //var direction = Math.round(Math.random()) == 0 ? false : true
+          //var rect = new RotatingRectangle(x, y, 10, 100, rotation, "rgba("+red+", "+green+", "+blue+", "+opacity+")", direction);
+          var rect = new RotatingRectanglef(x, y, 10, 105, rotation,"rgba("+red+", "+green+", "+blue+", "+opacity+")");
+          allShapesf.push(rect); 
+        }
+        return allShapesf;
+      }
+      function drawf() {
+        
+        var canvas = document.getElementById('canv');
+
+        if (canvas.getContext) {
+          var ctx = canvas.getContext('2d');
+          //ctx.clearRect(0, 0, 640, 680);
+          for (i=0; i < allShapesf.length; ++i) {
+            allShapesf[i].drawf(ctx);
+
+ 
+
+
+//document.getElementById('status').innerHTML = "rotation="+allShapesf.length;
+          } 
+        }
+      }
+
+      var allShapesf = generateShapesf();
+
+//rotationf
+
+//rotationstatic4
+
+    var t=0;
+      var RotatingRectangleeb = function(x, y, width, height, rot, rgb, direction){
+        //var RotatingRectangle = function(x, y, width, height, rot,col, direction){
+        var rotation = rot;
+        var rotationState = 0;
+ 
+        this.drawwb = function(ctx){
+            direction ? rotationState += rotation : rotationState -= rotation;
+
+   p=rop-25;
+ q=ropp-25;
+ //alert(RotatingRectangle.x+" "); 
+if (p+50>x+50*Math.cos(rotationState+1.5) && p<=(x+50*Math.cos(rotationState+1.5))+7.5 && q+50>=y+45*Math.sin(rotationState+1.5) && q<=(y+45*Math.sin(rotationState+1.5))+65  ){
+
+ // alert();
+ music.pause();
+ if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+if (p+50>x+50*Math.cos(rotationState-1.5) && p<=(x+50*Math.cos(rotationState-1.5))+7.5 && q+50>=y+45*Math.sin(rotationState-1.5) && q<=(y+45*Math.sin(rotationState-1.5))+65  ){
+
+ // alert();
+ music.pause();
+ if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+x=102;
+y=0.000520*x*x-0.65400*x+440;
+
+          ctx.save();
+          ctx.translate(x+(width/2), y+(height/2));
+          ctx.rotate(rotationState);
+          ctx.fillStyle = rgb;
+          //ctx.fillRect(0-(width/2), 0-(height/2), width, height);
+          ctx.drawImage(sabers,0-(width/2),0-(height/2));
+          ctx.restore();
+          
+        }
+      }
+/*
+      function init(){
+//bb++;
+//alert(bb+"");
+
+var i;
+
+var d = new Date();
+    var n = d.getSeconds();
+    var f = d.getMinutes();
+    //alert(n+"");
+        
+        //if(bb==5000){
+//bb=0;
+//if((n>50) || (n<40 && n>30) || (n<20 && n>10) ){
+  if((f%2)==1){
+
+//alert(t+"");
+  if(n>40 && t==0 ){
+   //t = Math.floor(Math.random() * 20000)+15000;
+   setTimeout(draw,20000);
+
+  //out();
+  //for(var i=0;i<t;i++){
+
+//if(i==t){
+  //init();
+//}
+//if((i+2)==t){
+  //alert(t+'');
+    //setTimeout(draw,t);
+//}
+//alert();
+  //}
+        //setTimeout(draw,t);
+       // alert(n+"");
+      }
+    }
+      //if(n<50){
+        else{
+          
+       // setInterval(draw, 30);
+      // generateShapes();
+       //setTimeout(draw,15000);
+       //draw();
+      }
+      
+      }
+setInterval(init, 30);
+/*function out(){
+  var t = Math.floor(Math.random() * 16000)+13000;
+  setTimeout(init, t);
+  alert(t+"");
+}
+*/
+      function generateShapessb(){
+        var count = 1;
+
+        var allShapessb = [];
+        for (i=0; i < count; ++i) {
+          var rotation = (Math.random()*.10)+0.05;
+          //var x = Math.floor(Math.random() * 640);
+          //var y = Math.floor(Math.random() * 480);
+          var x =102;
+          var y=480;
+          //var col=ctx.fillStyle = "magenta";
+         // var red = Math.floor(Math.random() * 256);
+          //var green = Math.floor(Math.random() * 256);
+          //var blue = Math.floor(Math.random() * 256);
+           var red = 46;
+          var green = 123;
+          var blue = 10;
+          //var opacity = Math.random();
+          var opacity = 1;
+          var direction = Math.round(Math.random()) == 0 ? false : true
+          var rect = new RotatingRectangleeb(x, y, 15, 130, rotation, "rgba("+red+", "+green+", "+blue+", "+opacity+")", direction);
+          //var rect = new RotatingRectangle(x, y, 50, 50, rotation,col, direction);
+          allShapessb.push(rect); 
+        }
+        return allShapessb;
+      }
+      function drawwb() {
+        var canvas = document.getElementById('canv');
+
+        if (canvas.getContext) {
+          var ctx = canvas.getContext('2d');
+          //ctx.clearRect(0, 0, 640, 480);
+          for (i=0; i < allShapessb.length; ++i) {
+            allShapessb[i].drawwb(ctx);
+
+
+//document.getElementById('status').innerHTML = "rotations1="+allShapes.length;
+
+          } 
+        }
+      }
+
+      var allShapessb = generateShapessb();
+//rotationstatic4
+//rotationstatic4f
+
+    var t=0;
+      var RotatingRectangleebf = function(x, y, width, height, rot, rgb, direction){
+        //var RotatingRectangle = function(x, y, width, height, rot,col, direction){
+        var rotation = rot;
+        var rotationState = 0;
+ 
+        this.drawwbf = function(ctx){
+            direction ? rotationState += rotation : rotationState -= rotation;
+x=102;
+y=0.000520*x*x-0.65400*x+440;
+
+          ctx.save();
+          ctx.translate(x+(width/2), y+(height/2));
+          ctx.rotate(rotationState);
+          ctx.fillStyle = rgb;
+         // ctx.fillRect(0-(width/2), 0-(height/2), width, height);
+         ctx.drawImage(sabers,0-(width/2),0-(height/2));
+          ctx.restore();
+          
+        }
+      }
+/*
+      function init(){
+//bb++;
+//alert(bb+"");
+
+var i;
+
+var d = new Date();
+    var n = d.getSeconds();
+    var f = d.getMinutes();
+    //alert(n+"");
+        
+        //if(bb==5000){
+//bb=0;
+//if((n>50) || (n<40 && n>30) || (n<20 && n>10) ){
+  if((f%2)==1){
+
+//alert(t+"");
+  if(n>40 && t==0 ){
+   //t = Math.floor(Math.random() * 20000)+15000;
+   setTimeout(draw,20000);
+
+  //out();
+  //for(var i=0;i<t;i++){
+
+//if(i==t){
+  //init();
+//}
+//if((i+2)==t){
+  //alert(t+'');
+    //setTimeout(draw,t);
+//}
+//alert();
+  //}
+        //setTimeout(draw,t);
+       // alert(n+"");
+      }
+    }
+      //if(n<50){
+        else{
+          
+       // setInterval(draw, 30);
+      // generateShapes();
+       //setTimeout(draw,15000);
+       //draw();
+      }
+      
+      }
+setInterval(init, 30);
+/*function out(){
+  var t = Math.floor(Math.random() * 16000)+13000;
+  setTimeout(init, t);
+  alert(t+"");
+}
+*/
+      function generateShapessbf(){
+        var count = 1;
+
+        var allShapessbf = [];
+        for (i=0; i < count; ++i) {
+          var rotation = (Math.random()*.10)+0.05;
+          //var x = Math.floor(Math.random() * 640);
+          //var y = Math.floor(Math.random() * 480);
+          var x =102;
+          var y=480;
+          //var col=ctx.fillStyle = "magenta";
+         // var red = Math.floor(Math.random() * 256);
+          //var green = Math.floor(Math.random() * 256);
+          //var blue = Math.floor(Math.random() * 256);
+           var red = 46;
+          var green = 123;
+          var blue = 10;
+          //var opacity = Math.random();
+          var opacity = 1;
+          var direction = Math.round(Math.random()) == 0 ? false : true
+          var rect = new RotatingRectangleebf(x, y, 15, 130, rotation, "rgba("+red+", "+green+", "+blue+", "+opacity+")", direction);
+          //var rect = new RotatingRectangle(x, y, 50, 50, rotation,col, direction);
+          allShapessbf.push(rect); 
+        }
+        return allShapessbf;
+      }
+      function drawwbf() {
+        var canvas = document.getElementById('canv');
+
+        if (canvas.getContext) {
+          var ctx = canvas.getContext('2d');
+          //ctx.clearRect(0, 0, 640, 480);
+          for (i=0; i < allShapessbf.length; ++i) {
+            allShapessbf[i].drawwbf(ctx);
+
+
+//document.getElementById('status').innerHTML = "rotations1="+allShapes.length;
+
+          } 
+        }
+      }
+
+      var allShapessbf = generateShapessbf();
+//rotationstatic4f
+//rotationstatic5
+
+    var t=0;
+      var RotatingRectangleebb = function(x, y, width, height, rot, rgb, direction){
+        //var RotatingRectangle = function(x, y, width, height, rot,col, direction){
+        var rotation = rot;
+        var rotationState = 0;
+ 
+        this.drawwbb = function(ctx){
+            direction ? rotationState += rotation : rotationState -= rotation;
+   p=rop-25;
+ q=ropp-25;
+ //alert(RotatingRectangle.x+" "); 
+if (p+50>x+50*Math.cos(rotationState+1.5) && p<=(x+50*Math.cos(rotationState+1.5))+7.5 && q+50>=y+45*Math.sin(rotationState+1.5) && q<=(y+45*Math.sin(rotationState+1.5))+65  ){
+
+ // alert();
+ music.pause();
+ if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+if (p+50>x+50*Math.cos(rotationState-1.5) && p<=(x+50*Math.cos(rotationState-1.5))+7.5 && q+50>=y+45*Math.sin(rotationState-1.5) && q<=(y+45*Math.sin(rotationState-1.5))+65  ){
+
+  //alert();
+  music.pause();
+  if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+x=1228;
+y=0.000520*x*x-0.65400*x+440;
+
+          ctx.save();
+          ctx.translate(x+(width/2), y+(height/2));
+          ctx.rotate(rotationState);
+          ctx.fillStyle = rgb;
+          //ctx.fillRect(0-(width/2), 0-(height/2), width, height);
+          ctx.drawImage(sabers,0-(width/2),0-(height/2));
+          ctx.restore();
+          
+        }
+      }
+/*
+      function init(){
+//bb++;
+//alert(bb+"");
+
+var i;
+
+var d = new Date();
+    var n = d.getSeconds();
+    var f = d.getMinutes();
+    //alert(n+"");
+        
+        //if(bb==5000){
+//bb=0;
+//if((n>50) || (n<40 && n>30) || (n<20 && n>10) ){
+  if((f%2)==1){
+
+//alert(t+"");
+  if(n>40 && t==0 ){
+   //t = Math.floor(Math.random() * 20000)+15000;
+   setTimeout(draw,20000);
+
+  //out();
+  //for(var i=0;i<t;i++){
+
+//if(i==t){
+  //init();
+//}
+//if((i+2)==t){
+  //alert(t+'');
+    //setTimeout(draw,t);
+//}
+//alert();
+  //}
+        //setTimeout(draw,t);
+       // alert(n+"");
+      }
+    }
+      //if(n<50){
+        else{
+          
+       // setInterval(draw, 30);
+      // generateShapes();
+       //setTimeout(draw,15000);
+       //draw();
+      }
+      
+      }
+setInterval(init, 30);
+/*function out(){
+  var t = Math.floor(Math.random() * 16000)+13000;
+  setTimeout(init, t);
+  alert(t+"");
+}
+*/
+      function generateShapessbb(){
+        var count = 1;
+
+        var allShapessbb = [];
+        for (i=0; i < count; ++i) {
+          var rotation = (Math.random()*.10)+0.05;
+          //var x = Math.floor(Math.random() * 640);
+          //var y = Math.floor(Math.random() * 480);
+          var x =1228;
+          var y=490;
+          //var col=ctx.fillStyle = "magenta";
+         // var red = Math.floor(Math.random() * 256);
+          //var green = Math.floor(Math.random() * 256);
+          //var blue = Math.floor(Math.random() * 256);
+           var red = 46;
+          var green = 123;
+          var blue = 10;
+          //var opacity = Math.random();
+          var opacity = 1;
+          var direction = Math.round(Math.random()) == 0 ? false : true
+          var rect = new RotatingRectangleebb(x, y, 15, 130, rotation, "rgba("+red+", "+green+", "+blue+", "+opacity+")", direction);
+          //var rect = new RotatingRectangle(x, y, 50, 50, rotation,col, direction);
+          allShapessbb.push(rect); 
+        }
+        return allShapessbb;
+      }
+      function drawwbb() {
+        var canvas = document.getElementById('canv');
+
+        if (canvas.getContext) {
+          var ctx = canvas.getContext('2d');
+          //ctx.clearRect(0, 0, 640, 480);
+          for (i=0; i < allShapessbb.length; ++i) {
+            allShapessbb[i].drawwbb(ctx);
+
+
+//document.getElementById('status').innerHTML = "rotations1="+allShapes.length;
+
+          } 
+        }
+      }
+
+      var allShapessbb = generateShapessbb();
+//rotationstatic5
+//rotationstatic5f
+
+    var t=0;
+      var RotatingRectangleebbf = function(x, y, width, height, rot, rgb, direction){
+        //var RotatingRectangle = function(x, y, width, height, rot,col, direction){
+        var rotation = rot;
+        var rotationState = 0;
+ 
+        this.drawwbbf = function(ctx){
+            direction ? rotationState += rotation : rotationState -= rotation;
+x=1228;
+y=0.000520*x*x-0.65400*x+440;
+
+          ctx.save();
+          ctx.translate(x+(width/2), y+(height/2));
+          ctx.rotate(rotationState);
+          ctx.fillStyle = rgb;
+          //ctx.fillRect(0-(width/2), 0-(height/2), width, height);
+          ctx.drawImage(sabers,0-(width/2),0-(height/2));
+          ctx.restore();
+          
+        }
+      }
+/*
+      function init(){
+//bb++;
+//alert(bb+"");
+
+var i;
+
+var d = new Date();
+    var n = d.getSeconds();
+    var f = d.getMinutes();
+    //alert(n+"");
+        
+        //if(bb==5000){
+//bb=0;
+//if((n>50) || (n<40 && n>30) || (n<20 && n>10) ){
+  if((f%2)==1){
+
+//alert(t+"");
+  if(n>40 && t==0 ){
+   //t = Math.floor(Math.random() * 20000)+15000;
+   setTimeout(draw,20000);
+
+  //out();
+  //for(var i=0;i<t;i++){
+
+//if(i==t){
+  //init();
+//}
+//if((i+2)==t){
+  //alert(t+'');
+    //setTimeout(draw,t);
+//}
+//alert();
+  //}
+        //setTimeout(draw,t);
+       // alert(n+"");
+      }
+    }
+      //if(n<50){
+        else{
+          
+       // setInterval(draw, 30);
+      // generateShapes();
+       //setTimeout(draw,15000);
+       //draw();
+      }
+      
+      }
+setInterval(init, 30);
+/*function out(){
+  var t = Math.floor(Math.random() * 16000)+13000;
+  setTimeout(init, t);
+  alert(t+"");
+}
+*/
+      function generateShapessbbf(){
+        var count = 1;
+
+        var allShapessbbf = [];
+        for (i=0; i < count; ++i) {
+          var rotation = (Math.random()*.10)+0.05;
+          //var x = Math.floor(Math.random() * 640);
+          //var y = Math.floor(Math.random() * 480);
+          var x =1228;
+          var y=490;
+          //var col=ctx.fillStyle = "magenta";
+         // var red = Math.floor(Math.random() * 256);
+          //var green = Math.floor(Math.random() * 256);
+          //var blue = Math.floor(Math.random() * 256);
+           var red = 46;
+          var green = 123;
+          var blue = 10;
+          //var opacity = Math.random();
+          var opacity = 1;
+          var direction = Math.round(Math.random()) == 0 ? false : true
+          var rect = new RotatingRectangleebbf(x, y, 15, 130, rotation, "rgba("+red+", "+green+", "+blue+", "+opacity+")", direction);
+          //var rect = new RotatingRectangle(x, y, 50, 50, rotation,col, direction);
+          allShapessbbf.push(rect); 
+        }
+        return allShapessbbf;
+      }
+      function drawwbbf() {
+        var canvas = document.getElementById('canv');
+
+        if (canvas.getContext) {
+          var ctx = canvas.getContext('2d');
+          //ctx.clearRect(0, 0, 640, 480);
+          for (i=0; i < allShapessbbf.length; ++i) {
+            allShapessbbf[i].drawwbbf(ctx);
+
+
+//document.getElementById('status').innerHTML = "rotations1="+allShapes.length;
+
+          } 
+        }
+      }
+
+      var allShapessbbf = generateShapessbbf();
+//rotationstatic5f
+
+
+//rotationstatic2
+
+    var t=0;
+      var RotatingRectangleee = function(x, y, width, height, rot, rgb, direction){
+        //var RotatingRectangle = function(x, y, width, height, rot,col, direction){
+        var rotation = rot;
+        var rotationState = 0;
+ 
+        this.drawww = function(ctx){
+            direction ? rotationState += rotation : rotationState -= rotation;
+   p=rop-25;
+ q=ropp-25;
+ //alert(RotatingRectangle.x+" "); 
+if (p+50>x+50*Math.cos(rotationState+1.5) && p<=(x+50*Math.cos(rotationState+1.5))+7.5 && q+50>=y+45*Math.sin(rotationState+1.5) && q<=(y+45*Math.sin(rotationState+1.5))+65  ){
+
+  //alert();
+  music.pause();
+  if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+if (p+50>x+50*Math.cos(rotationState-1.5) && p<=(x+50*Math.cos(rotationState-1.5))+7.5 && q+50>=y+45*Math.sin(rotationState-1.5) && q<=(y+45*Math.sin(rotationState-1.5))+65  ){
+
+  //alert();
+  music.pause();
+  if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+x=665;
+y=0.000520*x*x-0.65400*x+440;
+
+          ctx.save();
+          ctx.translate(x+(width/2), y+(height/2));
+          ctx.rotate(rotationState);
+          ctx.fillStyle = rgb;
+          //ctx.fillRect(0-(width/2), 0-(height/2), width, height);
+          ctx.drawImage(sabers,0-(width/2),0-(height/2));
+          ctx.restore();
+          
+        }
+      }
+/*
+      function init(){
+//bb++;
+//alert(bb+"");
+
+var i;
+
+var d = new Date();
+    var n = d.getSeconds();
+    var f = d.getMinutes();
+    //alert(n+"");
+        
+        //if(bb==5000){
+//bb=0;
+//if((n>50) || (n<40 && n>30) || (n<20 && n>10) ){
+  if((f%2)==1){
+
+//alert(t+"");
+  if(n>40 && t==0 ){
+   //t = Math.floor(Math.random() * 20000)+15000;
+   setTimeout(draw,20000);
+
+  //out();
+  //for(var i=0;i<t;i++){
+
+//if(i==t){
+  //init();
+//}
+//if((i+2)==t){
+  //alert(t+'');
+    //setTimeout(draw,t);
+//}
+//alert();
+  //}
+        //setTimeout(draw,t);
+       // alert(n+"");
+      }
+    }
+      //if(n<50){
+        else{
+          
+       // setInterval(draw, 30);
+      // generateShapes();
+       //setTimeout(draw,15000);
+       //draw();
+      }
+      
+      }
+setInterval(init, 30);
+/*function out(){
+  var t = Math.floor(Math.random() * 16000)+13000;
+  setTimeout(init, t);
+  alert(t+"");
+}
+*/
+      function generateShapesss(){
+        var count = 1;
+
+        var allShapesss = [];
+        for (i=0; i < count; ++i) {
+          var rotation = (Math.random()*.10)+0.05;
+          //var x = Math.floor(Math.random() * 640);
+          //var y = Math.floor(Math.random() * 480);
+          var x =665;
+          var y=315;
+          //var col=ctx.fillStyle = "magenta";
+         // var red = Math.floor(Math.random() * 256);
+          //var green = Math.floor(Math.random() * 256);
+          //var blue = Math.floor(Math.random() * 256);
+           var red = 46;
+          var green = 123;
+          var blue = 10;
+          //var opacity = Math.random();
+          var opacity = 1;
+          var direction = Math.round(Math.random()) == 0 ? false : true
+          var rect = new RotatingRectangleee(x, y, 15, 130, rotation, "rgba("+red+", "+green+", "+blue+", "+opacity+")", direction);
+          //var rect = new RotatingRectangle(x, y, 50, 50, rotation,col, direction);
+          allShapesss.push(rect); 
+        }
+        return allShapesss;
+      }
+      function drawww() {
+        var canvas = document.getElementById('canv');
+
+        if (canvas.getContext) {
+          var ctx = canvas.getContext('2d');
+          //ctx.clearRect(0, 0, 640, 480);
+          for (i=0; i < allShapesss.length; ++i) {
+            allShapesss[i].drawww(ctx);
+
+
+//document.getElementById('status').innerHTML = "rotations2="+allShapes.length;
+          } 
+        }
+      }
+
+      var allShapesss = generateShapesss();
+//rotationstatic2
+
+//rotationstatic2f
+
+    var t=0;
+      var RotatingRectangleeef = function(x, y, width, height, rot, rgb, direction){
+        //var RotatingRectangle = function(x, y, width, height, rot,col, direction){
+        var rotation = rot;
+        var rotationState = 0;
+ 
+        this.drawwwf = function(ctx){
+            direction ? rotationState += rotation : rotationState -= rotation;
+x=665;
+y=0.000520*x*x-0.65400*x+440;
+
+          ctx.save();
+          ctx.translate(x+(width/2), y+(height/2));
+          ctx.rotate(rotationState);
+          ctx.fillStyle = rgb;
+          //ctx.fillRect(0-(width/2), 0-(height/2), width, height);
+          ctx.drawImage(sabers,0-(width/2),0-(height/2));
+          ctx.restore();
+          
+        }
+      }
+/*
+      function init(){
+//bb++;
+//alert(bb+"");
+
+var i;
+
+var d = new Date();
+    var n = d.getSeconds();
+    var f = d.getMinutes();
+    //alert(n+"");
+        
+        //if(bb==5000){
+//bb=0;
+//if((n>50) || (n<40 && n>30) || (n<20 && n>10) ){
+  if((f%2)==1){
+
+//alert(t+"");
+  if(n>40 && t==0 ){
+   //t = Math.floor(Math.random() * 20000)+15000;
+   setTimeout(draw,20000);
+
+  //out();
+  //for(var i=0;i<t;i++){
+
+//if(i==t){
+  //init();
+//}
+//if((i+2)==t){
+  //alert(t+'');
+    //setTimeout(draw,t);
+//}
+//alert();
+  //}
+        //setTimeout(draw,t);
+       // alert(n+"");
+      }
+    }
+      //if(n<50){
+        else{
+          
+       // setInterval(draw, 30);
+      // generateShapes();
+       //setTimeout(draw,15000);
+       //draw();
+      }
+      
+      }
+setInterval(init, 30);
+/*function out(){
+  var t = Math.floor(Math.random() * 16000)+13000;
+  setTimeout(init, t);
+  alert(t+"");
+}
+*/
+      function generateShapesssf(){
+        var count = 1;
+
+        var allShapesssf = [];
+        for (i=0; i < count; ++i) {
+          var rotation = (Math.random()*.10)+0.05;
+          //var x = Math.floor(Math.random() * 640);
+          //var y = Math.floor(Math.random() * 480);
+          var x =665;
+          var y=315;
+          //var col=ctx.fillStyle = "magenta";
+         // var red = Math.floor(Math.random() * 256);
+          //var green = Math.floor(Math.random() * 256);
+          //var blue = Math.floor(Math.random() * 256);
+           var red = 46;
+          var green = 123;
+          var blue = 10;
+          //var opacity = Math.random();
+          var opacity = 1;
+          var direction = Math.round(Math.random()) == 0 ? false : true
+          var rect = new RotatingRectangleeef(x, y, 15, 130, rotation, "rgba("+red+", "+green+", "+blue+", "+opacity+")", direction);
+          //var rect = new RotatingRectangle(x, y, 50, 50, rotation,col, direction);
+          allShapesssf.push(rect); 
+        }
+        return allShapesssf;
+      }
+      function drawwwf() {
+        var canvas = document.getElementById('canv');
+
+        if (canvas.getContext) {
+          var ctx = canvas.getContext('2d');
+          //ctx.clearRect(0, 0, 640, 480);
+          for (i=0; i < allShapesssf.length; ++i) {
+            allShapesssf[i].drawwwf(ctx);
+
+
+//document.getElementById('status').innerHTML = "rotations2="+allShapes.length;
+          } 
+        }
+      }
+
+      var allShapesssf = generateShapesssf();
+//rotationstatic2f
+
+function initCanvas(){
+    var ctx = document.getElementById('canv').getContext('2d');
+    var cW = ctx.canvas.width, cH = ctx.canvas.height;
+   
+   var mouseX;
+var mouseY;
+var x=0;
+var y=0;
+var keys=[];
+var speed=6;
+
+//var rop;
+//prev effects
+
+ var r;
+    var p;
+    var trayyy=[];
+
+   //var x  ;
+    //var y ;
+    var u =0 ;
+    
+    var t = 0.9;
+    var b = 247;
+    var mouseY;
+    var mousex;
+      //var ropp=0;
+
+var tray=[];
+var trays=[];
+var trayy=[];
+var trayyy=[];
+var trayyyf=[];
+var trayyyy=[];
+var trayyyyn=[];
+var rotfx1=0;
+var rotfy1=0;
+  /*    
+   ctx.canvas.addEventListener('mousemove', function(event){
+   mouseX = event.clientX - ctx.canvas.offsetLeft;
+   mouseY = event.clientY - ctx.canvas.offsetTop;
+
+  var status = document.getElementById('status');
+   status.innerHTML = mouseX+" | "+mouseY;
+});
+
+*/
+    function addtrayyy(){
+
+        var x = cW;
+        var y =Math.floor(Math.random() * 310) +290;
+        //alert(roty1+'');
+        rotfx1=x;
+        rotfy1=y;
+        var s= Math.floor(Math.random()*1  ) +1;
+        trayyy.push({"x":x,"y":y,"s":s});
+    } 
+
+    function boxs(){
+
+//setTimeout(addtrayyy,2000);
+addtrayyy();
+
+       for (var i=0;i<3;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "magenta";
+
+            //ctx.fillRect(trayyy[i].x-=trayyy[i].s*5, trayyy[i].y, 8, 8);
+            ctx.drawImage(flame,trayyy[i].x-=trayyy[i].s*5, trayyy[i].y, 8, 8);
+
+            ctx.fill();
+            
+ctx.restore();
+
+  p=rop-25;
+  q=ropp-25;
+if (p+50>trayyy[i].x && p<=trayyy[i].x+8 && q+50>=trayyy[i].y && q<=trayyy[i].y+8  ){
+
+// alert();
+music.pause();
+if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+
+
+            if(trayyy[i].x<0){
+                trayyy.splice(i,100);
+            }
+
+ 
+        }
+        
+    }
+
+ function addtrayyyf(){
+
+        var x = rotfx1;
+        var y =rotfy1;
+        var s= Math.floor(Math.random()*1  ) +1;
+        trayyyf.push({"x":x,"y":y,"s":s});
+    } 
+
+    function boxsf(){
+
+//setTimeout(addtrayyy,2000);
+addtrayyy();
+
+       for (var i=0;i<3;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "magenta";
+
+            //ctx.fillRect(trayyy[i].x, trayyy[i].y, 8, 8);
+            ctx.drawImage(flame,trayyy[i].x, trayyy[i].y, 8, 8);
+
+            ctx.fill();
+            
+ctx.restore();
+
+
+
+
+
+            if(trayyy[i].x<0){
+                trayyy.splice(i,100);
+            }
+
+ 
+        }
+        
+    }
+
+
+
+function addtrayyyy(){
+
+        var x =Math.floor(Math.random() * cW) +1;
+        var y =cH
+        var s= Math.floor(Math.random()*1  ) +1;
+        trayyyy.push({"x":x,"y":y,"s":s});
+    } 
+
+    function boxss(){
+
+
+addtrayyyy();
+
+       for (var i=0;i<6;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "white";
+
+            //ctx.fillRect(trayyyy[i].x, trayyyy[i].y-=trayyyy[i].s*3, 80, 300);
+            ctx.drawImage(ship,trayyyy[i].x,trayyyy[i].y-=trayyyy[i].s*2);
+            //ctx.drawImage(ship,trayyyy[i].x,trayyyy[i].y-=trayyyy[i].s*3);
+
+            ctx.fill();
+            
+ctx.restore();
+
+
+
+  p=rop-25;
+  q=ropp-25;
+if (p+50>trayyyy[i].x && p<=trayyyy[i].x+80 && q+50>=trayyyy[i].y && q<=trayyyy[i].y+300  ){
+
+ //alert();
+ music.pause();
+ if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+
+
+
+            if(trayyyy[i].y+250<0){
+                trayyyy.splice(i,100);
+            }
+
+ 
+        }
+        
+    }
+
+    function addtrayyyyf(){
+
+        var x =Math.floor(Math.random() * cW) +1;
+        var y =cH
+        var s= Math.floor(Math.random()*1  ) +1;
+        trayyyy.push({"x":x,"y":y,"s":s});
+    } 
+
+    function boxssf(){
+
+
+addtrayyyy();
+
+       for (var i=0;i<6;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "magenta";
+
+            //ctx.fillRect(trayyyy[i].x, trayyyy[i].y, 80, 300);
+ctx.drawImage(ship,trayyyy[i].x,trayyyy[i].y);
+            ctx.fill();
+            
+ctx.restore();
+
+/*
+p=mouseX-25;
+
+if (p+50>trayyyy[i].x && p<=trayyyy[i].x+5 && y+50>=trayyyy[i].y && y<=trayyyy[i].y+5  ){
+
+  alert();
+ 
+}
+*/
+
+            if(trayyyy[i].y+250<0){
+                trayyyy.splice(i,100);
+            }
+
+ 
+        }
+        
+    }
+
+
+
+     function addtray(){
+
+      var x = rop;
+        var y =0;
+        var s= Math.floor(Math.random()*1  ) +1;
+    
+        tray.push({"x":x,"y":y,"s":s});
+    } 
+
+    function box(){
+
+
+addtray();
+
+       for (var i=0;i<1;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "magenta";
+
+            //ctx.fillRect(tray[i].x, tray[i].y+=tray[i].s*10, 7, 20);
+ctx.drawImage(bullet,tray[i].x,tray[i].y+=tray[i].s*10);
+            ctx.fill();
+            
+ctx.restore();
+
+  p=rop-25;
+  q=ropp-25;
+if (p+50>tray[i].x && p<=tray[i].x+7 && q+50>=tray[i].y && q<=tray[i].y+20  ){
+
+ //alert();
+ music.pause();
+ if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+
+
+
+            if(tray[i].y>cH){
+                tray.splice(i,100);
+            }
+
+        }
+
+
+
+        
+    }
+    function addtrays(){
+
+      var x = 0;
+      //var rop;
+      //rop-25;
+      var y=ropp;
+        //var y =ropp;
+      // var y = 0.000520*rop*rop-0.65400*rop+515;  
+       
+        var s= Math.floor(Math.random()*1  ) +1;
+    
+        trays.push({"x":x,"y":y,"s":s});
+    } 
+
+    function boxsx(){
+
+//alert(y+"");
+addtrays();
+trays.y=ropp;
+       for (var i=0;i<1;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "magenta";
+
+            //ctx.fillRect(trays[i].x+=trays[i].s*7, trays[i].y, 20, 7);
+            ctx.drawImage(bullets,trays[i].x+=trays[i].s*7,trays[i].y);
+
+            ctx.fill();
+            
+ctx.restore();
+
+p=rop-25;
+q=ropp-25;
+if (p+50>trays[i].x && p<=trays[i].x+20 && q+50>=trays[i].y && q<=trays[i].y+7  ){
+
+// alert
+music.pause();
+if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+
+
+            if(trays[i].x>cW){
+                trays.splice(i,100);
+            }
+
+        }
+
+
+
+        
+    }
+    function boxsxf(){
+
+//alert(y+"");
+addtrays();
+trays.y=ropp;
+       for (var i=0;i<1;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "magenta";
+
+            //ctx.fillRect(trays[i].x, trays[i].y, 20, 7);
+
+            ctx.drawImage(bullets,trays[i].x,trays[i].y);
+            ctx.fill();
+            
+ctx.restore();
+
+//r=mouseX-25;
+  
+//if (r+50>tray[i].x && r<=tray[i].x+5 && y+50>=tray[i].y && y<=tray[i].y+15  ){
+
+  //alert();
+ 
+//}
+
+
+            if(trays[i].x>cW){
+                trays.splice(i,100);
+            }
+
+        }
+
+
+
+        
+    }
+
+
+     function addtrayy(){
+
+      var x = rop;
+        var y =0;
+        var s= Math.floor(Math.random()*1  ) +1;
+      
+        trayy.push({"x":x,"y":y,"s":s});
+    } 
+
+      
+
+          function boxx(){
+
+
+setTimeout(addtrayy,1000);
+
+       for (var i=0;i<1;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "magenta";
+
+           // ctx.fillRect(trayy[i].x, trayy[i].y+=trayy[i].s*7, 7, 20);
+            ctx.drawImage(bullet,trayy[i].x,trayy[i].y+=trayy[i].s*7);
+
+            ctx.fill();
+            
+ctx.restore();
+
+
+p=rop-25;
+q=ropp-25;
+if (p+50>trayy[i].x && p<=trayy[i].x+7 && q+50>=trayy[i].y && q<=trayy[i].y+20  ){
+
+ //alert();
+ music.pause();
+ if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+
+
+
+            if(trayy[i].y>cH){
+                trayy.splice(i,100);
+            }
+
+          
+        }
+
+
+    }
+      
+
+
+//prev effects
+/*
+function background(){
+  var rot=0.016;
+var rots=0;
+
+  this.x = -480,this.y = -20,this.w = bg.width,this.h=bg.height;
+  this.render = function(ctx){
+
+
+rots +=rot;
+    //ctx.beginPath();
+        ctx.save();
+       //ctx.clearRect(0, 0, cW, cH);
+       //ctx.translate(this.x+(this.w/2),this.y+(this.h/2));
+
+    //ctx.rotate(rots);
+    ctx.drawImage(bg,this.x,this.y);
+   // ctx.translate(-(this.x+(this.w/2)),-(this.y+(this.h/2)));
+//alert(rot+"");
+ctx.restore();
+  }
+}
+
+var back= new background();
+
+*/
+function addtrayyyyn(){
+
+        var x =Math.floor(Math.random() * cW) +1;
+        var y =cH
+        var s= Math.floor(Math.random()*1  ) +1;
+        trayyyyn.push({"x":x,"y":y,"s":s});
+    } 
+
+    function boxssn(){
+
+
+addtrayyyyn();
+
+       for (var i=0;i<1;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "grey";
+
+            //ctx.fillRect(trayyyyn[i].x, trayyyyn[i].y-=trayyyyn[i].s*0.3, 1220, 300);
+            //ctx.fillRect(trayyyyn[i].x+1350, trayyyyn[i].y-=trayyyyn[i].s*0.3, 1220, 300);
+//ctx.fillRect(trayyyyn[i].x-1350, trayyyyn[i].y-=trayyyyn[i].s*0.3, 1220, 300);
+
+ctx.drawImage(ships,trayyyyn[i].x,trayyyyn[i].y-=trayyyyn[i].s*0.3);
+ctx.drawImage(ships,trayyyyn[i].x+1350,trayyyyn[i].y-=trayyyyn[i].s*0.3);
+ctx.drawImage(ships,trayyyyn[i].x-1350,trayyyyn[i].y-=trayyyyn[i].s*0.3);
+            ctx.fill();
+            
+ctx.restore();
+
+
+
+p=rop-25;
+q=ropp-25;
+if (p+50>trayyyyn[i].x && p<=trayyyyn[i].x+1220 && q+50>=trayyyyn[i].y && q<=trayyyyn[i].y+300  ){
+
+  //alert();
+  music.pause();
+  if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+if (p+50>(trayyyyn[i].x-1350) && p<=(trayyyyn[i].x-1350)+1220 && q+50>=trayyyyn[i].y && q<=trayyyyn[i].y+300  ){
+
+  //alert();
+  music.pause();
+  if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+if (p+50>(trayyyyn[i].x+1350) && p<=(trayyyyn[i].x+1350)+1220 && q+50>=trayyyyn[i].y && q<=trayyyyn[i].y+300  ){
+
+  //alert();
+  music.pause();
+  if(!sound_muted) {
+    sound = document.createElement("audio");
+    sound.src = "gameover.mp3";
+    sound.play();
+  }
+  clearInterval(animateInterval);
+document.getElementById("overlay").style.visibility="visible";
+ 
+}
+
+            if(trayyyyn[i].y+250<0){
+                trayyyyn.splice(i,100);
+            }
+
+ 
+        }
+        
+    }
+   /* function addtrayyyyn(){
+
+        var x =Math.floor(Math.random() * cW) +1;
+        var y =cH
+        var s= Math.floor(Math.random()*1  ) +1;
+        trayyyyn.push({"x":x,"y":y,"s":s});
+    } 
+    */
+
+    function boxssnf(){
+
+
+addtrayyyyn();
+
+       for (var i=0;i<1;i++)
+        {
+ 
+ ctx.save();
+
+            ctx.beginPath();
+
+ctx.fillStyle = "magenta";
+/*
+            ctx.fillRect(trayyyyn[i].x, trayyyyn[i].y, 1220, 300);
+            ctx.fillRect(trayyyyn[i].x+1350, trayyyyn[i].y, 1220, 300);
+ctx.fillRect(trayyyyn[i].x-1350, trayyyyn[i].y, 1220, 300);
+*/
+
+ctx.drawImage(ships,trayyyyn[i].x,trayyyyn[i].y);
+ctx.drawImage(ships,trayyyyn[i].x+1350,trayyyyn[i].y);
+ctx.drawImage(ships,trayyyyn[i].x-1350,trayyyyn[i].y);
+            ctx.fill();
+            
+ctx.restore();
+
+/*
+p=mouseX-25;
+
+if (p+50>trayyyyn[i].x && p<=trayyyyn[i].x+5 && y+50>=trayyyyn[i].y && y<=trayyyyn[i].y+5  ){
+
+  alert();
+ 
+}
+*/
+
+            if(trayyyyn[i].y+250<0){
+                trayyyyn.splice(i,100);
+            }
+
+ 
+        }
+        
+    }
+ /*       
+  ctx.canvas.addEventListener('mousemove', function(event){
+     mouseX = event.clientX - ctx.canvas.offsetLeft;
+   mouseY = event.clientY - ctx.canvas.offsetTop;
+    
+
+   var status = document.getElementById('statuss');
+   status.innerHTML = mouseX+" | "+mouseY;
+});
+*/
+
+window.addEventListener("keydown",function(e){
+keys[e.keyCode]=true;
+},false);
+
+
+
+window.addEventListener("keyup",function(e){
+delete keys[e.keyCode];
+},false);
+
+function anim(){
+  // ctx.beginPath();
+   //ctx.save();
+//ctx.clearRect(0, 0, cW, cH);
+//ctx.fillStyle = "magenta";
+   var flag=0;
+          
+
+            //ctx.fillRect(x, y, 50, 50);
+
+//y=0.001899*x*x-0.75*x+475;
+  y=0.000520*x*x-0.65400*x+515;       
+ropp=y+25;
+         //x1 = mouseX-25;
+   /*
+    if(keys[37]) x-=speed;
+    rop=x+25;
+  if(keys[39]) x+=speed;
+  rop=x+25;
+  if(x<-25) x=-25;
+  if(x>=cW-25) x=cW-25;
+*/
+        //ctx.restore();
+       ctx.arc(662, 1550, 1200, 0, Math.PI * 2);
+
+         ctx.stroke();
+
+  
+    if (keys[37])
+    {
+
+     foot = document.createElement("audio");
+  foot.src = "footstep.mp3";
+  foot.playbackRate = 0.5;
+
+  
+  foot.loop = true;
+  foot.play();
+ 
+     /* sound = document.createElement("audio");
+    sound.src = "footsteps1.mp3";
+    sound.play(); */
+
+      x-=speed;
+    rop=x+25;
+   //player.drawAnimated(x,y,[6,7,8,9,10],ctx);
+   player.drawAnimated(x,y,[6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,8,8,8,8,8,8,8,8,8,8,8,8,9,9,9,9,9,9,9,9,9,9,9,9,10,10,10,10,10,10,10,10,10,10,10,10],ctx);
+   ropp=y+25;
+ //flag=1;
+  }
+   else if(keys[39])
+    {
+ foot = document.createElement("audio");
+  foot.src = "footstep.mp3";
+  foot.playbackRate = 0.5;
+
+  
+  foot.loop = true;
+  foot.play();
+
+     /* sound = document.createElement("audio");
+    sound.src = "footsteps1.mp3";
+    sound.play();*/
+      //if(keydown=true)
+     x+=speed;
+  rop=x+25;
+  if(x<-25) x=-25;
+  if(x>=cW-25) x=cW-25;
+  // player.drawAnimated(x,y,[12,13,14,15,16],ctx);
+     player.drawAnimated(x,y,[12,12,12,12,12,12,12,12,12,12,12,12,13,13,13,13,13,13,13,13,13,13,13,13,14,14,14,14,14,14,14,14,14,14,14,14,15,15,15,15,15,15,15,15,15,15,15,15,16,16,16,16,16,16,16,16,16,16,16,16],ctx);
+     ropp=y+25;
+    //flag=0;
+    //flag=keys[39];
+}
+
+ else{
+ 
+   // x=rop;
+    player.drawAnimated(x,y,[0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4],ctx);
+    ropp=y+25;
+    //player.drawAnimated(x,y,[6],ctx);
+    //foot.pause();
+  }
+}
+
+
+
+
+    function background(){
+
+
+  this.x = 0,this.y = 0,this.w = back.width,this.h=back.height;
+  this.render = function(){
+       
+    ctx.drawImage(back,this.x++,0);
+    if(this.x>=1330){
+        this.x=-1330;
+    }
+
+   
+   
+
+  }
+}
+
+    function background1(){
+
+
+  this.x = -1330,this.y = 0,this.w = back2.width,this.h=back2.height;
+  this.render = function(){
+
+
+
+       
+    ctx.drawImage(back2,this.x++,0);
+    if(this.x>=1330){
+        this.x=-1330;
+    }
+
+   
+  }
+}
+
+var backk= new background();
+var backk2= new background1();
+
+    function animate(){
+        var d = new Date();
+    var n = d.getSeconds();
+    var f = d.getMinutes();
+
+        ctx.save();
+        ctx.clearRect(0, 0, cW, cH);
+        
+        backk.render();
+        backk2.render();
+        ctx.drawImage(path,0,0);
+        ctx.drawImage(back1,0,0);
+anim(); 
+/*
+if((n>30 && n<51)&& ((f%2)==1 ) ){
+ draw();
+}
+if((n>28 && n<30) && ((f%2)==1 ) ){
+setTimeout(drawf,1000);
+}
+if((n>17 && n<27) && ((f%2)==0 ) ){
+ draww();
+ }
+ if((n>15 && n<17) && ((f%2)==0 ) ){
+setTimeout(drawwf,1000);
+}
+if((n>17 && n<27) && ((f%2)==1 )){ 
+drawww();
+}
+if(n>15 && n<17 && ((f%2)==1 )){
+setTimeout(drawwwf,1000);
+}
+
+if((n>17 && n<27) && ((f%2)==0 ) ){
+drawwww();
+}
+if((n>15 && n<17) && ((f%2)==0 ) ){
+  setTimeout(drawwwwf,1000);
+
+}
+if((n>52) || (n<1) ){
+boxs();
+}
+if(n>50 && n<52){
+setTimeout(boxsf,1000);
+}
+if(n>4 && n<14 &&((f%3)==0 ) ){
+ boxss();
+}
+if(n>2 && n<4  &&((f%3)==0 )){
+ setTimeout(boxssf,1000);
+}
+if((n>35 && n<45)&& ((f%2)==0 ) ){
+ drawwb();
+}
+if((n>33 && n<35) && ((f%2)==0 ) ){
+setTimeout(drawwbf,1000);
+}
+if((n>35 && n<45)&& ((f%2)==0 ) ){
+ drawwbb();
+}
+if((n>33 && n<35) && ((f%2)==0 ) ){
+setTimeout(drawwbbf,1000);
+}
+*/
+/*
+if((n>30 && n<51) ){
+ draw();
+}
+if((n>28 && n<30)){
+setTimeout(drawf,1000);
+}
+if((n>17 && n<27) && ((f%2)==0 ) ){
+ draww();
+ }
+ if((n>15 && n<17) && ((f%2)==0 ) ){
+setTimeout(drawwf,1000);
+}
+if((n>17 && n<27) && ((f%2)==1 )){ 
+drawww();
+}
+if(n>15 && n<17 && ((f%2)==1 )){
+setTimeout(drawwwf,1000);
+}
+
+if((n>17 && n<27) && ((f%2)==0 ) ){
+drawwww();
+}
+if((n>15 && n<17) && ((f%2)==0 ) ){
+  setTimeout(drawwwwf,1000);
+
+}
+if((n>52) || (n<1) ){
+boxs();
+}
+if(n>50 && n<52){
+setTimeout(boxsf,1000);
+}
+if((n>30 && n<51) ){
+ //boxssn();
+}
+
+
+if(n>4 && n<14 &&((f%2)==0 ) ){
+ boxss();
+}
+if(n>2 && n<4  &&((f%2)==0 )){
+ setTimeout(boxssf,1000);
+}
+if((n>17 && n<27) && ((f%2)==1 )){ 
+ drawwb();
+}
+if(n>15 && n<17 && ((f%2)==1 )){
+setTimeout(drawwbf,1000);
+}
+if((n>17 && n<27) && ((f%2)==1 )){ 
+ drawwbb();
+}
+if(n>15 && n<17 && ((f%2)==1 )){
+setTimeout(drawwbbf,1000);
+}*/
+/*
+if((n>17 && n<27) && ((f%2)==0 ) ){
+ draww();
+ }
+ if((n>15 && n<17) && ((f%2)==0 ) ){
+setTimeout(drawwf,1000);
+}*/
+if((n>17 && n<27) && ((f%2)==1 )){ 
+drawww();
+}
+if(n>15 && n<17 && ((f%2)==1 )){
+setTimeout(drawwwf,1000);
+}
+/*
+if((n>17 && n<27) && ((f%2)==0 ) ){
+drawwww();
+}
+if((n>15 && n<17) && ((f%2)==0 ) ){
+  setTimeout(drawwwwf,1000);
+
+}*/
+if((n>52) || (n<1) ){
+boxs();
+}
+if(n>50 && n<52){
+setTimeout(boxsf,1000);
+}
+
+
+if(n>4 && n<14  ){
+ boxss();
+}
+if(n>2 && n<4  ){
+ setTimeout(boxssf,1000);
+}
+if((n>17 && n<27) && ((f%2)==1 )){ 
+ drawwb();
+}
+if(n>15 && n<17 && ((f%2)==1 )){
+setTimeout(drawwbf,1000);
+}
+if((n>17 && n<27) && ((f%2)==1 )){ 
+ drawwbb();
+}
+if(n>15 && n<17 && ((f%2)==1 )){
+setTimeout(drawwbbf,1000);
+}
+//wanted
+
+if((((n>53) || (n<15))&& ((f%2)==0 )) || (f%2==1) ){
+boxsx();
+}
+if((n>51 && n<53&& ((f%2)==0 )) ){
+
+setTimeout(boxsxf,1000);
+}
+//wanted
+box();
+boxx();
+//new
+if((n>20 && n<51)&& ((f%2)==0 ) ){
+
+ boxssn();
+}
+if((n>15 && n<20)&& ((f%2)==0 ) ){
+  setTimeout( boxssnf,1000);
+ 
+  }
+//new
+if((n>30 && n<51)&& ((f%2)==1 ) ){
+ draw();
+}
+if((n>28 && n<30)&& ((f%2)==1 )){
+setTimeout(drawf,1000);
+}
+        ctx.restore();
+    }
+    var animateInterval = setInterval(animate, 30);
+    /*
+    ctx.canvas.addEventListener('click', function(event) {
+        clearInterval(animateInterval);
+    });
+*/
+}
+window.addEventListener('load', function(event) {
+    initCanvas();
+});
+</script>
+</head>
+<body>
+<canvas id="canv" width="1330" height="650"></canvas>
+
+<div id="overlay">
+<div id="popup">
+            
+
+<l><font style="font-size: 34px; font-family:'EamesBookItalic','Georgia',serif; color: #3cb9d5"><br>You &nbsp were &nbsp KILLED  !!</font></l>
+<p align="center" style="font-size: 30px; font-family:'EamesBookItalic','Georgia',serif; color: red">G A M E &nbsp&nbsp&nbsp O V E R</p>
+<a href="index.html"><img class="close_button_1" src="home.png" style="right:310px"/></a>
+<a href="reflexe_sound.html"><img class="close_button_2" src="retry.png" style="right:100px"/></a>
+
+</div>
+</div>
+
+</body>  
+</html>
