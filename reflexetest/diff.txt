@@ -1,4 +1,0 @@
-var start=getTime();
-var end=getTime();
-var diff=end-start;
-$.post(".php",{time:diff},function(){});
